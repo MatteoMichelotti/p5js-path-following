@@ -1,12 +1,11 @@
 class Vehicle {
     constructor(x, y) {
-        this.maxSpeed = 1;//random(3,7);
-        this.maxForce = 0.05;//random(0.3,0.5);
+        this.maxSpeed = random(3,7);
+        this.maxForce = random(0.3,0.5);
 
         this.position = createVector(x, y);
         this.velocity = createVector(1, 0);
         this.acceleration = createVector(0, 0);
-
     }
 
     run() {
@@ -55,16 +54,24 @@ class Vehicle {
             }
         }
 
-        if (!path.isOnPath(closest)) {
+        const isClosestOnPath = path.isOnPath(closest);
+
+        if (!isClosestOnPath) {
             //determine target on path (even different segment), 20 frames in the future
-            //target = ...
-            // this.seek(target);
+            if (p5.Vector.dist(segmentEndTarget, normal) > 0){
+                const dirSegment = p5.Vector.sub(segmentEndTarget, normal).normalize().mult(20);
+                target = p5.Vector.add(normal, dirSegment);
+            }
+            this.seek(target);
         }
 
         if (debug) {
             push();
             noFill();
-            stroke(path.isOnPath(closest) ? 0 : 255, 0, 0);
+            stroke(255);
+            if (target)
+                ellipse(target.x, target.y, 9,9);
+            stroke(isClosestOnPath ? 0 : 255, 0, 0);
             ellipse(predictedPosition.x, predictedPosition.y, 5, 5);
             line(normal.x, normal.y, predictedPosition.x, predictedPosition.y);
             ellipse(normal.x, normal.y, 5, 5);
