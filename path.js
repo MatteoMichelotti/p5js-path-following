@@ -1,7 +1,7 @@
 class Path {
     constructor() {
         this.nodes = [];
-        this.radius = 30;
+        this.radius = 10;
     }
 
     addNode(node) {

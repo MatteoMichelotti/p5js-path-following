@@ -1,10 +1,10 @@
 class Vehicle {
     constructor(x, y) {
-        this.maxSpeed = random(3,7);
-        this.maxForce = random(0.3,0.5);
+        this.maxSpeed = random(3,5);
+        this.maxForce = random(0.2,0.3);
 
         this.position = createVector(x, y);
-        this.velocity = createVector(1, 0);
+        this.velocity = createVector(2, 0);
         this.acceleration = createVector(0, 0);
     }
 
@@ -25,6 +25,9 @@ class Vehicle {
     }
 
     follow(path) {
+        // Get nodes of path
+        const pathNodes = path.getNodes();
+
         // Predict position 50 (arbitrary) frames ahead
         let predict = this.velocity.copy().normalize().mult(50);
         let predictedPosition = p5.Vector.add(this.position, predict);
@@ -33,37 +36,35 @@ class Vehicle {
         let normal = null;
         let target = null;
         let closest = 999999;
-        let segmentEndTarget = null;
-        const pathNodes = path.getNodes();
 
         for (let i = 0; i < pathNodes.length - 1; i++) {
+            // Get edges of current segment of path
             let segmentStart = pathNodes[i].copy();
             let segmentEnd = pathNodes[i + 1].copy();
 
+            // Find unity vector (direction) of segment
             let dir = p5.Vector.sub(segmentEnd, segmentStart).normalize();
 
+            // Get normal point of predicted position on segment
             let normalPoint = this.getNormal(predictedPosition, segmentStart, segmentEnd);
+
+            // If normal is not on segment, consider segment end as normal point
             if (normalPoint.x < segmentStart.x || normalPoint.x > segmentEnd.x)
                 normalPoint = segmentEnd.copy();
 
+            // Calculate distance of predicted point from path
             const normalDist = p5.Vector.dist(normalPoint, predictedPosition);
             if (normalDist < closest) {
                 closest = normalDist;
-                segmentEndTarget = segmentEnd.copy();
-                normal = p5.Vector.add(normalPoint.copy(), dir);
+                normal = normalPoint;
+
+                target = p5.Vector.add(normalPoint.copy(), dir.mult(10));
             }
         }
 
-        const isClosestOnPath = path.isOnPath(closest);
-
-        if (!isClosestOnPath) {
-            //determine target on path (even different segment), 20 frames in the future
-            if (p5.Vector.dist(segmentEndTarget, normal) > 0){
-                const dirSegment = p5.Vector.sub(segmentEndTarget, normal).normalize().mult(20);
-                target = p5.Vector.add(normal, dirSegment);
-            }
+        let isClosestOnPath = path.isOnPath(closest);
+        if (!isClosestOnPath && target)
             this.seek(target);
-        }
 
         if (debug) {
             push();
@@ -91,8 +92,11 @@ class Vehicle {
     }
 
     seek(target) {
-        var desired = p5.Vector.sub(target, this.position).setMag(this.maxSpeed);
-        var steer = p5.Vector.sub(desired, this.velocity).limit(this.maxForce);
+        let desired = p5.Vector.sub(target, this.position);
+        if (desired.mag() === 0) return;
+        desired.setMag(this.maxSpeed);
+
+        const steer = p5.Vector.sub(desired, this.velocity).limit(this.maxForce);
 
         this.applyForce(steer);
     }

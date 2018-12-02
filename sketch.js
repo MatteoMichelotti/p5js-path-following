@@ -1,6 +1,6 @@
 let vehicles = [];
 let path;
-let debug = true;
+let debug = false;
 
 function setup() {
     createCanvas(800, 600);
@@ -18,7 +18,7 @@ function setup() {
         { x: 400, y: 150 },
         { x: 460, y: 160 },
         { x: 510, y: 310 },
-        { x: 580, y: 450 },
+        { x: 580, y: 350 },
         { x: 625, y: 310 },
         { x: 670, y: 210 },
         { x: 800, y: 150 },
@@ -44,7 +44,7 @@ function draw() {
     });
 }
 
-function mousePressed() {
+function mouseDragged() {
     if (0 < mouseX && mouseX < width && 0 < mouseY && mouseY < height)
         vehicles.push(new Vehicle(mouseX, mouseY));
 }
