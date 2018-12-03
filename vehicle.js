@@ -1,7 +1,7 @@
 class Vehicle {
     constructor(x, y) {
         this.maxSpeed = random(3,5);
-        this.maxForce = random(0.2,0.3);
+        this.maxForce = random(0.2,0.4);
 
         this.position = createVector(x, y);
         this.velocity = createVector(2, 0);
@@ -58,7 +58,7 @@ class Vehicle {
                 closest = normalDist;
                 normal = normalPoint;
 
-                target = p5.Vector.add(normalPoint.copy(), dir.mult(10));
+                target = p5.Vector.add(normalPoint, dir.mult(10));
             }
         }
 

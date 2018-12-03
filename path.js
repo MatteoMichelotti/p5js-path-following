@@ -1,7 +1,22 @@
 class Path {
-    constructor() {
+    constructor(w, h) {
         this.nodes = [];
-        this.radius = 10;
+        this.radius = 20;
+
+        this.width = w;
+        this.height = h;
+    }
+
+    generateNodes(n){
+        this.nodes = [];
+        let xOffset = this.width/n;
+        let noiseOffset = 0;
+        const noiseX = random(50);
+
+        for (let i=-1; i<=n; i++){
+            this.addNode({ x: i*xOffset, y: map(noise(noiseX, noiseOffset), 0, 1, 0, this.height) });
+            noiseOffset += 0.2;
+        }
     }
 
     addNode(node) {
